@@ -1,5 +1,4 @@
 -- ty https://devforum.roblox.com/t/linking-your-custom-chat-to-the-roblox-chat-button/3752276
--- This is a hack, meaning this can break in the future!
 local StarterGui = game:GetService("StarterGui")
 
 local visibilityChangedBindable = Instance.new("BindableEvent")

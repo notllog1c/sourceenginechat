@@ -7,4 +7,3 @@ ChatServer.sendMessageTo(game.Players.not_Iog1c, {
     trophy = "balls!!!!",
     messageType = "TROPHY_MSG"
 })
-print(1)

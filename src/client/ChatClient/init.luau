@@ -743,6 +743,7 @@ function ChatClient._toggle(active: boolean)
     local canvas: ScrollingFrame = chatUI.ChatBox.Container
 
     input.Text = ""
+    input.Visible = active
     input.Selectable = active
     
     chatContext.ScrollUp.Enabled = active
