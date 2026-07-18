@@ -322,12 +322,14 @@ function ChatClient.init(): typeof(ChatClient)
 		onScreenSizeChange()
 	end)
 
-    if not TextChatService:CanUserChatAsync(localPlayer.UserId) then
-        ChatClient._onMessageReceive({
-            message = ChatShared.constants.CANT_CHAT_TEXT,
-            messageType = "SERVER_MSG"
-        })
-    end
+    pcall(function()
+        if not TextChatService:CanUserChatAsync(localPlayer.UserId) then
+            ChatClient._onMessageReceive({
+                message = ChatShared.constants.CANT_CHAT_TEXT,
+                messageType = "SERVER_MSG"
+            })
+        end
+    end)
 
     RunService.Heartbeat:Connect(function(deltaTime: number)
         local scrollingFrame: ScrollingFrame = chatUI.ChatBox.Container
