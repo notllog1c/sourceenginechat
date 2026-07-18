@@ -3,7 +3,7 @@ local Teams = game:GetService("Teams")
 
 return {
     -- Change these to your own, otherwise you won't have any chat related sounds. 
-    -- The sound files should be inside the github repo in /assets!
+    -- The sound files should be inside the github repo in /assets! (https://github.com/notllog1c/sourceenginechat/tree/main/assets)
     ACHIEVEMENT_EARNED_SOUND_ID = 71426628700233,
     WARNING_SOUND_ID = 99076385938789,
     TALK_SOUND_ID = 124916214164440,

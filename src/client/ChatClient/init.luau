@@ -305,11 +305,6 @@ function ChatClient.init(): typeof(ChatClient)
     end]]
 
 	screenSize = workspace.CurrentCamera.ViewportSize
-	
-	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-		screenSize = workspace.CurrentCamera.ViewportSize
-		onScreenSizeChange()
-	end)
 
     preloadSound(ChatShared.constants.ACHIEVEMENT_EARNED_SOUND_ID)
     preloadSound(ChatShared.constants.WARNING_SOUND_ID)
@@ -320,7 +315,12 @@ function ChatClient.init(): typeof(ChatClient)
     ChatShared.init()
     CommandHandler.init()
     ChatClient._initGui()
-    ChatClient._initInput()
+	ChatClient._initInput()
+	
+	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+		screenSize = workspace.CurrentCamera.ViewportSize
+		onScreenSizeChange()
+	end)
 
     if not TextChatService:CanUserChatAsync(localPlayer.UserId) then
         ChatClient._onMessageReceive({
