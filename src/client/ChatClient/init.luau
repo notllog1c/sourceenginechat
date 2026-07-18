@@ -36,6 +36,7 @@ local camera = workspace.CurrentCamera
 local mouse = localPlayer:GetMouse()
 local screenSize = Vector2.zero
 local onSmallScreen = false
+local defaultFontSize
 local chatUI: Frame? = nil
 local textScale = 1
 
@@ -177,6 +178,7 @@ end
 local function makeNewMessage(): CanvasGroup
     local template = chatUI.ChatBox.Container.Template:Clone()
     template.Parent = chatUI.ChatBox.Container
+    template.Name = "message"
     template.Visible = true
 
     if ChatClient.isChatting then
@@ -251,10 +253,16 @@ local function updateLabel(label: TextLabel | TextBox, string: string)
 end
 
 -- Ensure rich text is properly scaled on all devices.
-local function processText(text: string): string
+local function processText(text: string, isMessage: boolean?, whitelistedRichText: boolean?): string
     text = text:gsub('size="(%d+)"', function(size: string)
         size = tonumber(size) :: number
-        return 'size="' .. (size * textScale) .. '"'
+
+        -- Only whitelisted people can change font size.
+        if isMessage and not whitelistedRichText then
+            return `size="{defaultFontSize}"`
+        end
+
+        return `size="{size * textScale}"`
     end)
     
     return text
@@ -387,6 +395,8 @@ function ChatClient._initGui()
 		chatUI.Position = UDim2.new(chatUI.Position.X.Scale, 0, 0, 24)
 		chatUI.AnchorPoint = Vector2.zero
 	end
+
+    defaultFontSize = chatUI.ChatBox.Container.Template.Label.TextSize
 	
 	-- damn rojo..
 	chatContext.ScrollUp.TouchBinding.UIButton = chatUI.ScrollBarButtons.Up
@@ -621,7 +631,8 @@ function ChatClient._handleMessage(
     extra_data: ChatShared.extra_data?,
     label: TextBox
 ): boolean
-    message_data.message = processText(message_data.message or "")
+    local allowedRichText = extra_data and extra_data.canUseRichText or false
+    message_data.message = processText(message_data.message or "", true, allowedRichText)
     message_data.message = processExtraData(message_data.message, extra_data)
 
     if message_data.messageType == "SERVER_MSG" then
@@ -797,7 +808,7 @@ function ChatClient.close()
             continue
         end
 
-        local tween = TweenService:Create(message, TweenInfo.new(ChatShared.constants.MESSAGE_FADE_TIME), {GroupTransparency = 1})
+        local tween = TweenService:Create(message, TweenInfo.new(ChatShared.constants.CHATBOX_FADE_OUT_TIME), {GroupTransparency = 1})
         tween:Play()
 
         --[[tween.Completed:Once(function()
