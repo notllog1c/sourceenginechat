@@ -26,9 +26,9 @@ local Config = {
     Players = {
         {
             userId = game.CreatorId,
-            --prefix = `<font color="#FF0000">[Get rid of me in <font color="#FFFFFF" weight="heavy">ExtraDataHandler.luau</font>!]</font> `,
-            --subfix = ` <i><font size="8"><font color="#FF0000">[<font weight="heavy">!!!</font>]</font></font></i>`,
-            --chatColor = Color3.new(1, 0.84, 0),
+            prefix = `<font color="#FF0000">[Get rid of me in <font color="#FFFFFF" weight="heavy">ExtraDataHandler.luau</font>!]</font> `,
+            subfix = ` <i><font size="8"><font color="#FF0000">[<font weight="heavy">!!!</font>]</font></font></i>`,
+            chatColor = Color3.new(1, 0.84, 0),
             --Custom fonts aren't recommended, due to them making text selecting harder.
             --chatFont = Font.new("Kalam", Enum.FontWeight.Heavy, Enum.FontStyle.Italic),
             canUseRichText = true
