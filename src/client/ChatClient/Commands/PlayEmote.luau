@@ -15,10 +15,8 @@ local legacyDefaultEmotes = {
 
 local NOT_SUPPORTED = "You can't use Emotes here."
 local R15_ONLY = "Only R15 avatars can use Emotes."
-local SWITCH_TO_R15 = "Switch to your R15 avatar to play Emote."
 local NO_MATCHING_EMOTE = "You can't use that Emote."
 local TEMPORARILY_UNAVAILABLE = "You can't use Emotes right now."
-local ANIMATION_PLAYING = "You cannot play Emotes during this action."
 local ERROR_COLOR = Color3.fromRGB(245, 50, 50)
 
 local function getEmoteName(message): string?
