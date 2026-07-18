@@ -9,11 +9,12 @@ local RunService = game:GetService("RunService")
 local GuiService = game:GetService("GuiService")
 local StarterGui = game:GetService("StarterGui")
 
+local CameraInput = require(game.Players.LocalPlayer.PlayerScripts.PlayerModule.CameraModule.CameraInput)
 local ChatShared = require(ReplicatedStorage:FindFirstChild("ChatShared", true))
 local CoreGuiInject = require(script.CoreGuiInject)
-local CameraInput = require(game.Players.LocalPlayer.PlayerScripts.PlayerModule.CameraModule.CameraInput)
+local CommandHandler = require(script.CommandHandler)
 
-local getUserColor = require(script.getUserColor)
+local Util = require(script.Util)
 
 local preloadedSounds = {}
 local ChatClient = {
@@ -32,7 +33,6 @@ local ChatClient = {
 
 local localPlayer = game.Players.LocalPlayer :: Player
 local chatContext = script.ChatContext
-local camera = workspace.CurrentCamera
 local mouse = localPlayer:GetMouse()
 local screenSize = Vector2.zero
 local onSmallScreen = false
@@ -40,24 +40,7 @@ local defaultFontSize
 local chatUI: Frame? = nil
 local textScale = 1
 
-local function checkForEmote(message: string): boolean
-    local PlayEmote: BindableFunction = localPlayer.Character:FindFirstChild("PlayEmote", true)
-    local emote = ""
-
-    if string.sub(message, 1, 3) == "/e " then
-		emote = string.sub(message, 4)
-	elseif string.sub(message, 1, 7) == "/emote " then
-		emote = string.sub(message, 8)
-    else
-        return false
-	end
-
-    if PlayEmote then
-        PlayEmote:Invoke(emote)
-    end
-
-    return true
-end
+local VERIFIED_EMOJI = utf8.char(0xE000)
 
 local function hookValueToMessage(message: CanvasGroup): NumberValue
     local value = Instance.new("NumberValue")
@@ -218,14 +201,6 @@ local function disableRobloxChat()
 	end
 end
 
-local function checkForTeamCommand(message: string)
-    if not localPlayer.Team then
-        return false
-    end
-
-    return string.sub(message, 1, 3) == "/t " or string.sub(message, 1, 6) == "/team "
-end
-
 local function getPlayerColor(player: Player): Color3
     if ChatShared.constants.TEAMS_ENABLED then
         if not player.Team then
@@ -235,7 +210,7 @@ local function getPlayerColor(player: Player): Color3
         return player.Team.TeamColor.Color
     end
 
-    return getUserColor(player.Name)
+    return Util.getChatColor(player.Name)
 end
 
 local function updateLabel(label: TextLabel | TextBox, string: string)
@@ -341,7 +316,9 @@ function ChatClient.init(): typeof(ChatClient)
     preloadSound(ChatShared.constants.TALK_SOUND_ID)
 
     disableRobloxChat()
+    Util.init()
     ChatShared.init()
+    CommandHandler.init()
     ChatClient._initGui()
     ChatClient._initInput()
 
@@ -438,12 +415,7 @@ function ChatClient._initGui()
 
     input:GetPropertyChangedSignal("Text"):Connect(function()
 		updateTextAlignment(input, true)
-
-        if checkForTeamCommand(input.Text) then
-            ChatClient.isChatting = false
-            ChatClient.open(true)
-            return
-        end
+        CommandHandler.TextUpdate(input.Text)
 		
 		if string.len(ChatShared.removeTags(input.Text)) > ChatShared.constants.MAX_MESSAGE_LENGTH then
 			playSound(ChatShared.constants.WARNING_SOUND_ID)
@@ -596,7 +568,6 @@ function ChatClient._onMessageReceive(
         destroyMessage(ChatClient._messages[1])
     end
 
-    -- TODO: play sound
     ChatClient._displayMessage(message_data, extra_data)
 end
 
@@ -607,6 +578,8 @@ function ChatClient._handlePlayerName(
 ): string
     local color = getPlayerColor(player)
     local team = player.Team
+
+    local verified = player.HasVerifiedBadge and ` {VERIFIED_EMOJI}` or ""
 
     local prefix = ""
     local subfix = ""
@@ -621,7 +594,7 @@ function ChatClient._handlePlayerName(
         prefix = `({team}) {prefix}`
     end
     
-    local final = `{prefix}<font color="#{color:ToHex()}">{player}</font>{subfix}`
+    local final = `{prefix}<font color="#{color:ToHex()}">{player}</font>{verified}{subfix}`
     return final
 end
 
@@ -731,7 +704,7 @@ function ChatClient.sendMessage()
         return
     end
 
-    if checkForEmote(message) then
+    if CommandHandler.ProcessMessage(message) then
         return
     end
 
