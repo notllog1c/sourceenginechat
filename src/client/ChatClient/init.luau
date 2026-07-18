@@ -313,9 +313,9 @@ function ChatClient.init(): typeof(ChatClient)
     disableRobloxChat()
     Util.init()
     ChatShared.init()
-    CommandHandler.init()
     ChatClient._initGui()
 	ChatClient._initInput()
+	CommandHandler.init(chatUI)
 	
 	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
 		screenSize = workspace.CurrentCamera.ViewportSize
